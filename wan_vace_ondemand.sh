@@ -14,13 +14,18 @@ WORKSPACE="${WORKSPACE:-/workspace}"
 MODELS="${WORKSPACE}/ComfyUI/models"
 MARKER="${MODELS}/diffusion_models/.wan_vace_provisioned"
 REPACK="https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files"
+# Flat cel-shaded Ghibli style LoRA (Wan 2.1 T2V 14B, applies to the 2.2 MoE
+# experts). Public HF mirror, no auth. Override with WAN_GHIBLI_LORA_URL.
+GHIBLI_LORA_URL="${WAN_GHIBLI_LORA_URL:-https://huggingface.co/Muapi/studio-ghibli-wan2.1-t2v-14b/resolve/main/studio-ghibli-wan2.1-t2v-14b.safetensors}"
+GHIBLI_LORA_NAME="studio-ghibli-wan2.1-t2v-14b.safetensors"
 
 if [[ -f "${MARKER}" ]]; then
   echo "wan vace: already provisioned"
   exit 0
 fi
 
-mkdir -p "${MODELS}/diffusion_models" "${MODELS}/text_encoders" "${MODELS}/vae"
+mkdir -p "${MODELS}/diffusion_models" "${MODELS}/text_encoders" "${MODELS}/vae" \
+  "${MODELS}/loras"
 
 _fetch() {
   local dest="$1" url="$2"
@@ -40,6 +45,7 @@ _fetch "${MODELS}/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" \
   "${REPACK}/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
 _fetch "${MODELS}/vae/wan_2.1_vae.safetensors" \
   "${REPACK}/vae/wan_2.1_vae.safetensors"
+_fetch "${MODELS}/loras/${GHIBLI_LORA_NAME}" "${GHIBLI_LORA_URL}"
 
 touch "${MARKER}"
 echo "wan vace: provisioning complete"
