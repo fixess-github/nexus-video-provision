@@ -47,5 +47,15 @@ _fetch "${MODELS}/vae/wan_2.1_vae.safetensors" \
   "${REPACK}/vae/wan_2.1_vae.safetensors"
 _fetch "${MODELS}/loras/${GHIBLI_LORA_NAME}" "${GHIBLI_LORA_URL}"
 
+# Higher-fidelity bf16 experts (unquantized) — only when requested, since each is
+# ~28GB. Lets a quality sweep A/B fp8 vs bf16 on the same warm boot.
+if [[ "${WAN_VACE_FETCH_BF16:-}" =~ ^(1|true|yes)$ ]]; then
+  echo "wan vace: WAN_VACE_FETCH_BF16 set — also fetching bf16 experts"
+  _fetch "${MODELS}/diffusion_models/wan2.2_fun_vace_high_noise_14B_bf16.safetensors" \
+    "${REPACK}/diffusion_models/wan2.2_fun_vace_high_noise_14B_bf16.safetensors"
+  _fetch "${MODELS}/diffusion_models/wan2.2_fun_vace_low_noise_14B_bf16.safetensors" \
+    "${REPACK}/diffusion_models/wan2.2_fun_vace_low_noise_14B_bf16.safetensors"
+fi
+
 touch "${MARKER}"
 echo "wan vace: provisioning complete"
