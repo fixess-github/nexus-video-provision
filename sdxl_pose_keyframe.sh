@@ -18,7 +18,8 @@ if [[ -f "${MARKER}" ]]; then
   exit 0
 fi
 
-mkdir -p "${MODELS}/checkpoints" "${MODELS}/controlnet"
+mkdir -p "${MODELS}/checkpoints" "${MODELS}/controlnet" \
+  "${MODELS}/ipadapter" "${MODELS}/clip_vision"
 
 _fetch() {
   local dest="$1" url="$2"
@@ -39,6 +40,13 @@ _fetch "${MODELS}/checkpoints/RealVisXL_V4.0.safetensors" \
 # missing piece Replicate could not provide; design doc §14).
 _fetch "${MODELS}/controlnet/xinsir_openpose_sdxl.safetensors" \
   "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/resolve/main/diffusion_pytorch_model.safetensors"
+
+# IP-Adapter Plus SDXL + its ViT-H CLIP vision encoder — masked per-character
+# identity conditioning (IPAdapterAdvanced in pose_keyframe_workflow.py).
+_fetch "${MODELS}/ipadapter/ip-adapter-plus_sdxl_vit-h.safetensors" \
+  "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors"
+_fetch "${MODELS}/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors" \
+  "https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors"
 
 touch "${MARKER}"
 echo "sdxl pose keyframe: provisioning complete"
